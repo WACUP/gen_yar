@@ -1,0 +1,177 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_FILEDLG DIALOGEX 0, 0, 372, 57
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    RTEXT           "Files to copy:",IDC_STATIC,89,5,45,8
+    EDITTEXT        IDC_FILES,139,6,41,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    RTEXT           "Total playlist file size:",IDC_STATIC,64,18,70,8
+    EDITTEXT        IDC_FILESIZE,139,18,41,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    CONTROL         "Create &playlist",IDC_PLAYLIST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,92,30,60,8
+    CONTROL         "Use playlist &title instead of filename",IDC_PLAYLISTTITLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,6,130,8
+    CONTROL         "Add &number to beginning of filename",IDC_NUMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,18,130,8
+    CONTROL         "Keep parent &directory",IDC_INCLUDEDIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,30,85,8
+    CONTROL         "&m3u8",IDC_PLAYLIST2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,101,42,35,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_FILEDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 369
+        VERTGUIDE, 64
+        VERTGUIDE, 201
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 50
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,13,0,0
+ PRODUCTVERSION 1,13,0,0
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080904b0"
+        BEGIN
+            VALUE "CompanyName", "WACUP (WinAmp Community Update Project)"
+            VALUE "FileDescription", "Winamp General Purpose Plug-in"
+            VALUE "FileVersion", "1.13.0.0"
+            VALUE "InternalName", "gen_yar.dll"
+            VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2022)"
+            VALUE "OriginalFilename", "gen_yar.dll"
+            VALUE "ProductName", "Yar-matey! Playlist Copier"
+            VALUE "ProductVersion", "1.13.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x809, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    65535                   "{9725C8BF-B577-4d72-93EF-5FB41D88FFC2}"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_PLUGIN_NAME         "Yar-matey! Playlist Copier v%s"
+    IDS_ERROR_CREATING_PL   "Error creating playlist file."
+    IDS_ERROR_COPYING       "Error copying file: '%s', skipping."
+    IDS_SELECT_LOCATION     "Select location to save files to..."
+    IDS_ALL_FILES           "All Files"
+    IDS_FILENAME_IGNORED    "(Filename Ignored)"
+    IDS_COPY_FILE_MENU      "Copy playlist files\tAlt+C"
+    IDS_UNINSTALL_PROMPT    "Do you also want to remove the saved settings from this plugin?"
+    IDS_ABOUT_MESSAGE       "%s\nUpdates by %s\n\nBuild date: %s\n\nModified from original @ http://apps.bcheck.net/\n\nPick 'Copy playlist files' from the main WACUP right-click menu or use Alt+C or Alt+U (if the first conflicts with a modern style skin)."
+END
+
+#endif    // English (United Kingdom) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

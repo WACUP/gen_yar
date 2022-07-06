@@ -1,0 +1,3 @@
+EXPORTS
+winampGetGeneralPurposePlugin @1
+winampUninstallPlugin @2
