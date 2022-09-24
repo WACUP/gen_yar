@@ -296,8 +296,8 @@ int x = 0,
 	}
 
 	// allocate From and To buffers
-	bigbuffFrom = (wchar_t*)malloc((buffsizeFrom+1)*sizeof(wchar_t)); // +1 for termination
-	bigbuffTo = (wchar_t*)malloc((buffsizeTo+1)*sizeof(wchar_t)); // +1 for termination
+	bigbuffFrom = (wchar_t*)plugin.memmgr->sysMalloc((buffsizeFrom+1)*sizeof(wchar_t)); // +1 for termination
+	bigbuffTo = (wchar_t*)plugin.memmgr->sysMalloc((buffsizeTo + 1) * sizeof(wchar_t)); // +1 for termination
 
 	// now build the big strings
 	pFrom = bigbuffFrom;
@@ -416,8 +416,8 @@ int x = 0,
 	fileOp.fFlags = FOF_MULTIDESTFILES | FOF_NOCONFIRMMKDIR;
 	FileAction(&fileOp);
 
-	free(bigbuffFrom);
-	free(bigbuffTo);
+	plugin.memmgr->sysFree(bigbuffFrom);
+	plugin.memmgr->sysFree(bigbuffTo);
 }
 
 // only use this on 5.53+ otherwise it may crash, etc
