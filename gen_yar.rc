@@ -124,7 +124,7 @@ BEGIN
             VALUE "FileDescription", "General Purpose Plug-in"
             VALUE "FileVersion", "1.13.0.0"
             VALUE "InternalName", "gen_yar.dll"
-            VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2022)"
+            VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2023)"
             VALUE "OriginalFilename", "gen_yar.dll"
             VALUE "ProductName", "Yar-matey! Playlist Copier"
             VALUE "ProductVersion", "1.13.0.0"

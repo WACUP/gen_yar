@@ -11,6 +11,8 @@
 #include <winamp/gen.h>
 #include <winamp/wa_ipc.h>
 
+#include <../wacup_version.h>
+
 #include "resource.h"
 #include "api.h"
 
@@ -31,11 +33,7 @@ wchar_t *title = 0;
 #define MYUPDATER WM_USER+70
 
 // Wasabi based services for localisation support
-api_language *WASABI_API_LNG = 0;
-// these two must be declared as they're used by the language api's
-// when the system is comparing/loading the different resources
-HINSTANCE WASABI_API_LNG_HINST = 0,
-		  WASABI_API_ORIG_HINST = 0;
+SETUP_API_LNG_VARS;
 
 #define GET_UNICODE_TITLE()\
 		{if(!title){wchar_t tempt[256] = { 0 };StringCchPrintf(tempt,\
@@ -62,7 +60,7 @@ void config(){
 		config_open = 1;
 		GET_UNICODE_TITLE();
 		StringCchPrintf(message, ARRAYSIZE(message), WASABI_API_LNGSTRINGW(IDS_ABOUT_MESSAGE),
-						title, L"Darren Owen aka DrO (2006-2022)", TEXT(__DATE__));
+						title, L"Darren Owen aka DrO (2006-" WACUP_COPYRIGHT L")", TEXT(__DATE__));
 		MessageBox(0, message, title, MB_SYSTEMMODAL | MB_ICONINFORMATION);
 		config_open = 0;
 	}
