@@ -380,7 +380,7 @@ int x = 0,
 			int songlength;
 			wchar_t *playlistTitle = 0, temp[50] = { 0 };
 
-				SetAndPlayPlaylistPos(x, FALSE);
+				SetAndPlayPlaylistPos(x, 0);
 				songlength = GetCurrentTrackLengthSeconds();
 				playlistTitle = (wchar_t*)GetPlaylistItemTitle(x);
 				StringCchPrintf(temp, ARRAYSIZE(temp), L"#EXTINF:%d,", songlength);
