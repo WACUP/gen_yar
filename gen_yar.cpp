@@ -222,7 +222,7 @@ int x = 0,
 
 	if(g_bSavePlaylist){
 		SendMessage(plugin.hwndParent, WM_COMMAND, WINAMP_BUTTON4, 0); // must stop to get lengths
-		lstrcpyn(&szDestLoc[nFileOffset], (!g_bSavem3u8?L"playlist.m3u":L"playlist.m3u8"), MAX_PATH);
+		wcsncpy(&szDestLoc[nFileOffset], (!g_bSavem3u8?L"playlist.m3u":L"playlist.m3u8"), MAX_PATH);
 		hPlsFile = CreateFile(szDestLoc, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, NULL);
 
 		if(hPlsFile == INVALID_HANDLE_VALUE){
@@ -315,13 +315,13 @@ int x = 0,
 			// -- add source file
 			sourcePath = (wchar_t*)szSrcLoc;
 			sourcePathLength = CrackFilename(sourcePath, &sourceFilename, &sourceExtension);
-			lstrcpyn(pFrom, sourcePath, buffsizeFrom);
+			wcsncpy(pFrom, sourcePath, buffsizeFrom);
 			pFrom += sourcePathLength + 1;
 			*pFrom = 0;
 
 			// -- add destination file
 			// add destination directory
-			lstrcpyn(pTo, szDestLoc, nFileOffset+1);
+			wcsncpy(pTo, szDestLoc, nFileOffset+1);
 			pTo += nFileOffset;
 			destFilename = pTo; // just filename (no path) for playlist
 
@@ -329,7 +329,7 @@ int x = 0,
 			if(g_bIncludeDirectory && sourceFilename > sourcePath + 4){ // is this a problem for network shares?
 			wchar_t* parentDirectory = sourceFilename-2;
 				while(parentDirectory>sourcePath+4 && *parentDirectory!='\\') parentDirectory--;
-				lstrcpyn(pTo, parentDirectory+1, (int)(sourceFilename - parentDirectory));
+				wcsncpy(pTo, parentDirectory+1, (int)(sourceFilename - parentDirectory));
 				pTo += sourceFilename - parentDirectory - 1;
 			}
 
@@ -350,7 +350,7 @@ int x = 0,
 			}
 
 			// add dest title
-			lstrcpyn(pTo, destTitle, destTitleLength + 1);
+			wcsncpy(pTo, destTitle, destTitleLength + 1);
 
 			// Remove bad chars from the file name (note much of this dll is not unicode-safe!)
 			wchar_t *p = pTo;
@@ -371,7 +371,7 @@ int x = 0,
 			pTo += destTitleLength;
 
 			// add file extension
-			lstrcpyn(pTo, sourceExtension, buffsizeTo);
+			wcsncpy(pTo, sourceExtension, buffsizeTo);
 			pTo += wcslen(sourceExtension) + 1;
 			*pTo = 0;
 
