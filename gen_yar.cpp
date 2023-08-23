@@ -18,7 +18,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.13"
+#define APPVER   "1.13.1"
 
 
 int PlayListCount = 0;
@@ -175,7 +175,7 @@ DWORD byteswritten = 0;
 
 	// encode as ANSI when saving to a m3u playlist
 	// encode as UTF8 when saving to a m3u8 playlist
-	char* textA8 = AutoChar(text,(!g_bSavem3u8?CP_ACP:CP_UTF8));
+	AutoChar textA8(text, (!g_bSavem3u8 ? CP_ACP : CP_UTF8));
 	return WriteFile(hFile, textA8, (DWORD)strlen(textA8), &byteswritten, NULL);
 }
 
@@ -438,7 +438,7 @@ wchar_t szDestLoc[MAX_PATH] = { 0 },
 	ofn.nMaxFile = ARRAYSIZE(szDestLoc);
 	ofn.lpstrTitle = WASABI_API_LNGSTRINGW(IDS_SELECT_LOCATION);
 	ofn.hwndOwner = plugin.hwndParent;
-	ofn.lpstrFilter = WASABI_API_LNGSTRINGW_BUF(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles));
+	ofn.lpstrFilter = FixFilterString(WASABI_API_LNGSTRINGW_BUF(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
 	ofn.lpstrInitialDir = ofn.lpstrDefExt = ofn.lpstrCustomFilter = ofn.lpstrFileTitle = NULL;
 	WASABI_API_LNGSTRINGW_BUF(IDS_FILENAME_IGNORED,szDestLoc,MAX_PATH);
 

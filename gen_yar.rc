@@ -104,8 +104,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,13,0,0
- PRODUCTVERSION 1,13,0,0
+ FILEVERSION 1,13,1,0
+ PRODUCTVERSION 1,13,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,12 +122,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "WACUP"
             VALUE "FileDescription", "General Purpose Plug-in"
-            VALUE "FileVersion", "1.13.0.0"
+            VALUE "FileVersion", "1.13.1.0"
             VALUE "InternalName", "gen_yar.dll"
             VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2023)"
             VALUE "OriginalFilename", "gen_yar.dll"
             VALUE "ProductName", "Yar-matey! Playlist Copier"
-            VALUE "ProductVersion", "1.13.0.0"
+            VALUE "ProductVersion", "1.13.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -153,7 +153,7 @@ BEGIN
     IDS_ERROR_CREATING_PL   "Error creating playlist file."
     IDS_ERROR_COPYING       "Error copying file: '%s', skipping."
     IDS_SELECT_LOCATION     "Select location to save files to..."
-    IDS_ALL_FILES           "All Files"
+    IDS_ALL_FILES           "All Files (*.*)|*.*||"
     IDS_FILENAME_IGNORED    "(Filename Ignored)"
     IDS_COPY_FILE_MENU      "Copy playlist files\tAlt+C"
     IDS_UNINSTALL_PROMPT    "Do you also want to remove the saved settings from this plugin?"
