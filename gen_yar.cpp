@@ -18,7 +18,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.13.1"
+#define APPVER   "1.13.2"
 
 
 int PlayListCount = 0;
@@ -104,7 +104,7 @@ wchar_t temp[255] = { 0 };
 		StringCchPrintf(temp, ARRAYSIZE(temp), L"%d,%03d", PlayListCount/1000, PlayListCount%1000);
 	}
 	else{
-		StringCchPrintf(temp, ARRAYSIZE(temp), L"%d", PlayListCount);
+		I2WStr(PlayListCount, temp, ARRAYSIZE(temp));
 	}
 
 	SetDlgItemText(hdlg, IDC_FILES, temp);
