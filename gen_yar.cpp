@@ -18,7 +18,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.13.2"
+#define APPVER   "1.13.3"
 
 
 int PlayListCount = 0;
@@ -74,7 +74,7 @@ HWND hwnd=(HWND)lpParameter;
 size_t fsize=0;
 
 	for(int x = 0; x < PlayListCount; x++){
-		const size_t size = GetFileSizeByPath(GetPlaylistItemFile(x));
+		const size_t size = GetFileSizeByPath(GetPlaylistItemFile(x, NULL));
 		if (size && (size != INVALID_FILE_SIZE))
 		{
 			fsize += (size / 1024);
@@ -268,7 +268,7 @@ int x = 0,
 		destPathLength;
 
 		// determine source length
-		sourcePath = (wchar_t *)GetPlaylistItemFile(x);
+		sourcePath = (wchar_t *)GetPlaylistItemFile(x, NULL);
 		sourcePathLength = CrackFilename(sourcePath, &sourceFilename, &sourceExtension);
 		buffsizeFrom += sourcePathLength +1; //+1 for separator
 
@@ -301,7 +301,7 @@ int x = 0,
 	pFrom = bigbuffFrom;
 	pTo = bigbuffTo;
 	for(x = 0; x < PlayListCount; x++) {
-		const wchar_t *szSrcLoc = GetPlaylistItemFile(x);
+		const wchar_t *szSrcLoc = GetPlaylistItemFile(x, NULL);
 		size_t size = GetFileSizeByPath(szSrcLoc);
 		if (size && (size != INVALID_FILE_SIZE)) { // skip missing / bad files
 		wchar_t *destTitle = 0,
