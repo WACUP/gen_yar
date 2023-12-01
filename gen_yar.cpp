@@ -18,7 +18,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.13.3"
+#define APPVER   "1.13.4"
 
 
 int PlayListCount = 0;
@@ -91,15 +91,15 @@ size_t fsize=0;
 }
 
 void FileHookInitDialog(HWND hdlg){
-DWORD dwThreadId = 0;
-wchar_t temp[255] = { 0 };
 
 	PlayListCount = GetPlaylistLength();
-	if (!CreateThread(NULL, 0, FileCountThread, (LPVOID)hdlg, 0, &dwThreadId))
+
+	if (!StartThread(FileCountThread, hdlg, THREAD_PRIORITY_NORMAL, 0, NULL))
 	{
 		return;
 	}
 
+	wchar_t temp[255] = { 0 };
 	if(PlayListCount>1000){
 		StringCchPrintf(temp, ARRAYSIZE(temp), L"%d,%03d", PlayListCount/1000, PlayListCount%1000);
 	}
@@ -466,12 +466,10 @@ ACCEL accel[] = {{FVIRTKEY|FALT,'C',},
 					// which is using Alt+R out of a limited set of chars.
 					{FVIRTKEY|FALT,'U',}};
 MENUITEMINFO mii = { 0 };
-	WASABI_API_LNG = plugin.language;
-	WASABI_API_START_LANG(plugin.hDllInstance,GenYarLangGUID);
 
-	static wchar_t pluginTitleW[256] = { 0 };
-	StringCchPrintf(pluginTitleW, ARRAYSIZE(pluginTitleW), WASABI_API_LNGSTRINGW(IDS_PLUGIN_NAME), TEXT(APPVER));
-	plugin.description = (char*)plugin.memmgr->sysDupStr(pluginTitleW);
+	WASABI_API_START_LANG_DESC(plugin.language, plugin.hDllInstance,
+								GenYarLangGUID, IDS_PLUGIN_NAME,
+								TEXT(APPVER), &plugin.description);
 
 	my_menu = RegisterCommandID(0);
 	accel[0].cmd = (WORD)my_menu;
@@ -504,7 +502,7 @@ extern "C" __declspec( dllexport ) winampGeneralPurposePlugin * winampGetGeneral
 
 extern "C" __declspec( dllexport ) int winampUninstallPlugin(HINSTANCE hDllInst, HWND hwndDlg, int param){
 	GET_UNICODE_TITLE();
-	if(MessageBox(hwndDlg, WASABI_API_LNGSTRINGW(IDS_UNINSTALL_PROMPT), title, MB_YESNO) == IDYES){
+	if (plugin.language->UninstallSettingsPrompt(reinterpret_cast<const wchar_t*>(title))) {
 		WritePrivateProfileString(APPNAMEW,0,0,GetPaths()->plugin_ini_file);
 	}
 	return GEN_PLUGIN_UNINSTALL_REBOOT;
