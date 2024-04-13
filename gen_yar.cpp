@@ -60,12 +60,12 @@ void config(){
 		config_open = 1;
 		GET_UNICODE_TITLE();
 		StringCchPrintf(message, ARRAYSIZE(message), WASABI_API_LNGSTRINGW(IDS_ABOUT_MESSAGE),
-						title, L"Darren Owen aka DrO (2006-" WACUP_COPYRIGHT L")", TEXT(__DATE__));
+						title, WACUP_AUTHOR_STRW L" (2006-" WACUP_COPYRIGHT L")", TEXT(__DATE__));
 		MessageBox(0, message, title, MB_SYSTEMMODAL | MB_ICONINFORMATION);
 		config_open = 0;
 	}
 	else{
-		SetActiveWindow(FindWindow(L"#32770", (wchar_t*)plugin.description));
+		SetActiveWindow(FindWindow(WC_DIALOG, (wchar_t*)plugin.description));
 	}
 }
 
@@ -354,7 +354,7 @@ int x = 0,
 
 			// Remove bad chars from the file name (note much of this dll is not unicode-safe!)
 			wchar_t *p = pTo;
-			for(;*p;p=CharNext(p)) {
+			for(;*p;p=(p+1)) {
 				switch(*p) {
 					case L'<': *p=L'«'; break;
 					case L'>': *p=L'»'; break;
@@ -378,11 +378,11 @@ int x = 0,
 			// -- add playlist entry
 			if(g_bSavePlaylist){
 			int songlength;
-			wchar_t *playlistTitle = 0, temp[50] = { 0 };
+			LPCWSTR playlistTitle = GetPlaylistItemTitle(x);
+			wchar_t temp[50] = { 0 };
 
 				SetAndPlayPlaylistPos(x, 0);
 				songlength = GetCurrentTrackLengthSeconds();
-				playlistTitle = (wchar_t*)GetPlaylistItemTitle(x);
 				StringCchPrintf(temp, ARRAYSIZE(temp), L"#EXTINF:%d,", songlength);
 
 				WriteLine(hPlsFile, temp);
@@ -491,7 +491,6 @@ MENUITEMINFO mii = { 0 };
 	mii.wID = my_menu;
 	mii.fType = MFT_STRING;
 	mii.dwTypeData = WASABI_API_LNGSTRINGW(IDS_COPY_FILE_MENU);
-	mii.cch = (UINT)(wcslen(mii.dwTypeData)+1);
 	InsertMenuItem(menu,GetMenuItemCount(menu)-adjuster-1,1,&mii);
 	return GEN_INIT_SUCCESS;
 }
