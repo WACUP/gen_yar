@@ -104,8 +104,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,13,4,0
- PRODUCTVERSION 1,13,4,0
+ FILEVERSION 1,14,0,0
+ PRODUCTVERSION 1,14,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,12 +122,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "WACUP"
             VALUE "FileDescription", "General Purpose Plug-in"
-            VALUE "FileVersion", "1.13.4.0"
+            VALUE "FileVersion", "1.14.0.0"
             VALUE "InternalName", "gen_yar.dll"
             VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2024)"
             VALUE "OriginalFilename", "gen_yar.dll"
             VALUE "ProductName", "Yar-matey! Playlist Copier"
-            VALUE "ProductVersion", "1.13.4.0"
+            VALUE "ProductVersion", "1.14.0.0"
         END
     END
     BLOCK "VarFileInfo"

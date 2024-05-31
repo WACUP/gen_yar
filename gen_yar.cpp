@@ -18,10 +18,11 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.13.4"
+#define APPVER   "1.14"
 
 
 int PlayListCount = 0;
+HANDLE g_hCopyThread = NULL;
 UINT my_menu = (UINT)-1;
 BOOL g_bSavePlaylist = FALSE,
 	 g_bSavem3u8 = TRUE,
@@ -41,7 +42,7 @@ SETUP_API_LNG_VARS;
 		TEXT(APPVER)); title = plugin.memmgr->sysDupStr(tempt); }}
 
 void config();
-void quit(){}
+void quit();
 int init();
 
 void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const
@@ -150,11 +151,16 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 		case WM_NOTIFY:
 			if( ((LPOFNOTIFY)lParam)->hdr.code == CDN_INITDONE) {
 			RECT rect = { 0 };
-				GetWindowRect(GetParent(hdlg), &rect);
-				SetWindowPos(GetParent(hdlg), 0, 
+			HWND parent = GetParent(hdlg);
+				GetWindowRect(parent, &rect);
+				SetWindowPos(parent, 0, 
 							 (GetSystemMetrics(SM_CXSCREEN)-(rect.right-rect.left))/2,
 							 (GetSystemMetrics(SM_CYSCREEN)-(rect.bottom-rect.top))/2,
 							 0, 0, SWP_NOSIZE);
+				DarkModeSetup(parent);
+			}
+			else if( ((LPOFNOTIFY)lParam)->hdr.code == CDN_FOLDERCHANGE) {
+				DarkModeSetup(GetParent(hdlg));
 			}
 		return TRUE;
 
@@ -424,26 +430,56 @@ void addAccelerators(HWND hwnd, ACCEL* accel, int accel_size, int translate_mode
 	if (hAccel) plugin.app->app_addAccelerators(hwnd, &hAccel, accel_size, translate_mode);
 }
 
+typedef struct
+{
+	wchar_t szDestLoc[MAX_PATH];
+	int nFileOffset;
+} CopyInfo;
+DWORD WINAPI CopyThread(LPVOID lp)
+{
+	CopyInfo* info = (CopyInfo*)lp;
+	if (info) {
+		(void)CreateCOM();
+
+		CopyFiles(info->szDestLoc, info->nFileOffset);
+
+		CloseCOM();
+
+		plugin.memmgr->sysFree(lp);
+	}
+
+	if (g_hCopyThread != NULL) {
+		CloseHandle(g_hCopyThread);
+		g_hCopyThread = NULL;
+	}
+	return 0;
+}
+
 void SaveThemFiles(void){
-OPENFILENAME ofn = { 0 };
-wchar_t szDestLoc[MAX_PATH] = { 0 },
-		allFiles[32] = { 0 };
+CopyInfo* info = (CopyInfo*)plugin.memmgr->sysMalloc(sizeof(CopyInfo));
+	if (info){
+		OPENFILENAME ofn = { 0 };
+		wchar_t allFiles[32] = { 0 };
+		ofn.Flags = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_ENABLESIZING;
+		ofn.hInstance = WASABI_API_LNG_HINST;
+		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FILEDLG);
+		ofn.lpfnHook = &OFNHookProc;
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.lpstrFile = info->szDestLoc;
+		ofn.nMaxFile = ARRAYSIZE(info->szDestLoc);
+		ofn.lpstrTitle = WASABI_API_LNGSTRINGW(IDS_SELECT_LOCATION);
+		ofn.hwndOwner = plugin.hwndParent;
+		ofn.lpstrFilter = FixFilterString(WASABI_API_LNGSTRINGW_BUF(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
+		ofn.lpstrInitialDir = ofn.lpstrDefExt = ofn.lpstrCustomFilter = ofn.lpstrFileTitle = NULL;
+		WASABI_API_LNGSTRINGW_BUF(IDS_FILENAME_IGNORED,info->szDestLoc,ARRAYSIZE(info->szDestLoc));
 
-	ofn.Flags = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_ENABLESIZING;
-	ofn.hInstance = WASABI_API_LNG_HINST;
-	ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FILEDLG);
-	ofn.lpfnHook = &OFNHookProc;
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.lpstrFile = szDestLoc;
-	ofn.nMaxFile = ARRAYSIZE(szDestLoc);
-	ofn.lpstrTitle = WASABI_API_LNGSTRINGW(IDS_SELECT_LOCATION);
-	ofn.hwndOwner = plugin.hwndParent;
-	ofn.lpstrFilter = FixFilterString(WASABI_API_LNGSTRINGW_BUF(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
-	ofn.lpstrInitialDir = ofn.lpstrDefExt = ofn.lpstrCustomFilter = ofn.lpstrFileTitle = NULL;
-	WASABI_API_LNGSTRINGW_BUF(IDS_FILENAME_IGNORED,szDestLoc,MAX_PATH);
-
-	if(SaveFileName(&ofn)){
-		CopyFiles(szDestLoc, ofn.nFileOffset);
+		if(SaveFileName(&ofn)){
+			info->nFileOffset=ofn.nFileOffset;
+			g_hCopyThread=StartThread(CopyThread,(LPVOID)info,THREAD_PRIORITY_NORMAL,1,NULL);
+		}
+		else{
+			plugin.memmgr->sysFree(info);
+		}
 	}
 }
 
@@ -451,7 +487,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 {
 	// we handle both messages so we can get the action when sent via the keyboard
 	// shortcut but also copes with using the menu via Winamp's taskbar system menu
-	if ((uMsg == WM_SYSCOMMAND || uMsg == WM_COMMAND) && LOWORD(wParam) == my_menu)
+	if ((uMsg == WM_SYSCOMMAND || uMsg == WM_COMMAND) && (LOWORD(wParam) == my_menu))
 	{
 		SaveThemFiles();
 	}
@@ -493,6 +529,16 @@ MENUITEMINFO mii = { 0 };
 	mii.dwTypeData = WASABI_API_LNGSTRINGW(IDS_COPY_FILE_MENU);
 	InsertMenuItem(menu,GetMenuItemCount(menu)-adjuster-1,1,&mii);
 	return GEN_INIT_SUCCESS;
+}
+
+void quit(){
+	if(g_hCopyThread != NULL){
+		WaitForSingleObject(g_hCopyThread,INFINITE);
+		if (g_hCopyThread != NULL) {
+			CloseHandle(g_hCopyThread);
+		}
+		g_hCopyThread = NULL;
+	}
 }
 
 extern "C" __declspec( dllexport ) winampGeneralPurposePlugin * winampGetGeneralPurposePlugin(){
