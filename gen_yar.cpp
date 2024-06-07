@@ -18,7 +18,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "1.14"
+#define APPVER   "1.14.1"
 
 
 int PlayListCount = 0;
@@ -61,6 +61,7 @@ void config(){
 		config_open = 1;
 		GET_UNICODE_TITLE();
 		StringCchPrintf(message, ARRAYSIZE(message), WASABI_API_LNGSTRINGW(IDS_ABOUT_MESSAGE),
+						// cppcheck-suppress unknownMacro
 						title, WACUP_AUTHOR_STRW L" (2006-" WACUP_COPYRIGHT L")", TEXT(__DATE__));
 		MessageBox(0, message, title, MB_SYSTEMMODAL | MB_ICONINFORMATION);
 		config_open = 0;
@@ -356,7 +357,10 @@ int x = 0,
 			}
 
 			// add dest title
-			wcsncpy(pTo, destTitle, destTitleLength + 1);
+			if (destTitle && *destTitle)
+			{
+				wcsncpy(pTo, destTitle, destTitleLength + 1);
+			}
 
 			// Remove bad chars from the file name (note much of this dll is not unicode-safe!)
 			wchar_t *p = pTo;
