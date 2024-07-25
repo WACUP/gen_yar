@@ -9,4 +9,8 @@
 
 #include <api/memmgr/api_memmgr.h>
 
+#include <playlist/api_playlistmanager.h>
+
+#include <playlist/ifc_playlistloadercallback.h>
+
 #endif

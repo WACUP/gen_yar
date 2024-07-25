@@ -1,9 +1,10 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Developer Studio generated include file.
+// Microsoft Visual C++ generated include file.
 // Used by gen_yar.rc
 //
 #define IDS_PLUGIN_NAME                 1
 #define IDS_MiB                         2
+#define IDS_COPY_FILES_FROM_SENDTO      2
 #define IDS_ERROR_CREATING_PL           3
 #define IDS_ERROR_COPYING               4
 #define IDS_SELECT_LOCATION             5
@@ -11,7 +12,7 @@
 #define IDS_FILENAME_IGNORED            7
 #define IDS_COPY_FILE_MENU              8
 #define IDS_UNINSTALL_PROMPT            9
-#define IDS_ABOUT_MESSAGE               10
+#define IDS_ABOUT_MESSAGE               9
 #define IDR_ACCEL_YAR                   101
 #define IDD_FILEDLG                     102
 #define IDC_PLAYLIST                    1000

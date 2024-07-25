@@ -44,6 +44,16 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United Kingdom) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -60,9 +70,9 @@ BEGIN
     EDITTEXT        IDC_FILESIZE,139,18,41,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "Create &playlist",IDC_PLAYLIST,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,92,30,60,8
     CONTROL         "Use playlist &title instead of filename",IDC_PLAYLISTTITLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,6,130,8
-    CONTROL         "Add &number to beginning of filename",IDC_NUMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,18,130,8
-    CONTROL         "Keep parent &directory",IDC_INCLUDEDIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,30,85,8
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,6,140,8
+    CONTROL         "Add &number to beginning of filename",IDC_NUMBER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,18,140,8
+    CONTROL         "Keep parent &directory",IDC_INCLUDEDIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,201,30,90,8
     CONTROL         "&m3u8",IDC_PLAYLIST2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,101,42,35,8
 END
 
@@ -87,16 +97,6 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (United States) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United Kingdom) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
-#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -104,8 +104,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_UK
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,14,1,0
- PRODUCTVERSION 1,14,1,0
+ FILEVERSION 2,0,0,0
+ PRODUCTVERSION 2,0,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,12 +122,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "WACUP"
             VALUE "FileDescription", "General Purpose Plug-in"
-            VALUE "FileVersion", "1.14.1.0"
+            VALUE "FileVersion", "2.0.0.0"
             VALUE "InternalName", "gen_yar.dll"
             VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2024)"
             VALUE "OriginalFilename", "gen_yar.dll"
             VALUE "ProductName", "Yar-matey! Playlist Copier"
-            VALUE "ProductVersion", "1.14.1.0"
+            VALUE "ProductVersion", "2.0.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -150,13 +150,14 @@ END
 STRINGTABLE
 BEGIN
     IDS_PLUGIN_NAME         "Yar-matey! Playlist Copier v%s"
+    IDS_COPY_FILES_FROM_SENDTO "Copy file(s) to folder..."
     IDS_ERROR_CREATING_PL   "Error creating playlist file."
     IDS_ERROR_COPYING       "Error copying file: '%s', skipping."
     IDS_SELECT_LOCATION     "Select location to save files to..."
     IDS_ALL_FILES           "All Files (*.*)|*.*||"
     IDS_FILENAME_IGNORED    "(Filename Ignored)"
     IDS_COPY_FILE_MENU      "Copy playlist files\tAlt+C"
-    IDS_ABOUT_MESSAGE       "%s\nUpdates by %s\n\nBuild date: %s\n\nModified from original @ http://apps.bcheck.net/\n\nPick 'Copy playlist files' from the main WACUP right-click menu or use Alt+C or Alt+U (if the first conflicts with a modern style skin)."
+    IDS_ABOUT_MESSAGE       "%s\nUpdates by %s\n\nBuild date: %s\n\nModified from original @ http://apps.bcheck.net/\n\nPick 'Copy playlist files' from the main WACUP right-click menu or use Alt+C or Alt+U (if the first conflicts with a modern style skin).\n\nThere's also now a ""Copy file(s) to folder..."" feature on the send-to menus since v2.0 so you're not just limited to the main playlist."
 END
 
 #endif    // English (United Kingdom) resources
