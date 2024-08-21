@@ -104,8 +104,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
+ FILEVERSION 2,0,1,0
+ PRODUCTVERSION 2,0,1,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -122,12 +122,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "WACUP"
             VALUE "FileDescription", "General Purpose Plug-in"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.0.1.0"
             VALUE "InternalName", "gen_yar.dll"
             VALUE "LegalCopyright", "v1.08+ updates Darren Owen aka DrO (2006-2024)"
             VALUE "OriginalFilename", "gen_yar.dll"
             VALUE "ProductName", "Yar-matey! Playlist Copier"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.0.1.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -157,7 +157,7 @@ BEGIN
     IDS_ALL_FILES           "All Files (*.*)|*.*||"
     IDS_FILENAME_IGNORED    "(Filename Ignored)"
     IDS_COPY_FILE_MENU      "Copy playlist files\tAlt+C"
-    IDS_ABOUT_MESSAGE       "%s\nUpdates by %s\n\nBuild date: %s\n\nModified from original @ http://apps.bcheck.net/\n\nPick 'Copy playlist files' from the main WACUP right-click menu or use Alt+C or Alt+U (if the first conflicts with a modern style skin).\n\nThere's also now a ""Copy file(s) to folder..."" feature on the send-to menus since v2.0 so you're not just limited to the main playlist."
+    IDS_ABOUT_MESSAGE       "%s\nUpdates by %s (2006-%s)\n\nBuild date: %s\n\nModified from original @ http://apps.bcheck.net/\n\nPick 'Copy playlist files' from the main WACUP right-click menu or use Alt+C or Alt+U (if the first conflicts with a modern style skin).\n\nThere's also now a ""Copy file(s) to folder..."" feature on the send-to menus since v2.0 so you're not just limited to the main playlist."
 END
 
 #endif    // English (United Kingdom) resources

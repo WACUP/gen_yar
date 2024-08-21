@@ -13,8 +13,6 @@
 #include <winamp/gen.h>
 #include <winamp/wa_cup.h>
 
-#include <../wacup_version.h>
-
 #include "resource.h"
 #include "api.h"
 
@@ -22,7 +20,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0"
+#define APPVER   "2.0.1"
 
 
 int PlayListCount = 0;
@@ -66,8 +64,7 @@ void config(){
 		config_open = 1;
 		GET_UNICODE_TITLE();
 		StringCchPrintf(message, ARRAYSIZE(message), WASABI_API_LNGSTRINGW(IDS_ABOUT_MESSAGE),
-						// cppcheck-suppress unknownMacro
-						unicode_title, WACUP_AUTHOR_STRW L" (2006-" WACUP_COPYRIGHT L")", TEXT(__DATE__));
+						unicode_title, WACUP_Author(), WACUP_Copyright(), TEXT(__DATE__));
 		MessageBox(0, message, unicode_title, MB_SYSTEMMODAL | MB_ICONINFORMATION);
 		config_open = 0;
 	}
