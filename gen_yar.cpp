@@ -293,15 +293,13 @@ DWORD WINAPI CopyThread(LPVOID lp)
 		for (int x = 0; x < PlayListCount; x++) {
 			wchar_t destFilename[MAX_PATH] = { 0 };
 			BOOL valid_entry = FALSE;
-			size_t file_len = 0;
 			if (!files)	{
 				GetPlaylistFile(x, destFilename, ARRAYSIZE(destFilename), &valid_entry, NULL);
 			}
 			else {
 				StringCchCopy(destFilename, ARRAYSIZE(destFilename), file);
 				valid_entry = (file && *file);
-				file_len = wcslen(file);
-				file += (file_len + 1);
+				file += (wcslen(file) + 1);
 			}
 
 			const BOOL is_an_url = IsAnUrl(destFilename);
