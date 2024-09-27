@@ -5,6 +5,7 @@
 #include <loader/loader/utils.h>
 #include <loader/loader/ini.h>
 #include <loader/loader/paths.h>
+#include <loader/loader/runtime_helper.h>
 
 #include <nu/autochar.h>
 #include <nu/servicebuilder.h>
@@ -676,3 +677,5 @@ extern "C" __declspec( dllexport ) int winampUninstallPlugin(HINSTANCE hDllInst,
 	}
 	return GEN_PLUGIN_UNINSTALL_REBOOT;
 }
+
+RUNTIME_LEN_HELPER_HANDLER
