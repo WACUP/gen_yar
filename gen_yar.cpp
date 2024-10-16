@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.1"
+#define APPVER   "2.0.2"
 
 
 int PlayListCount = 0;
@@ -612,6 +612,20 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 				}
 
 				stuff->was_us = 1;
+			}
+		}
+		else if ((lParam == IPC_HOOK_OKTOQUIT) && wParam)
+		{
+			CheckThreadHandleIsValid(&g_hCopyThread);
+
+			// if we're in the process of copying then we
+			// have to get the user to cancel the action.
+			// due to that we're going to block the close
+			wchar_t titleStr[96] = { 0 };
+			if (!!g_hCopyThread && TimedMessageBox(plugin.hwndParent, WASABI_API_LNGSTRINGW(IDS_CANCEL_AND_QUIT),
+				WASABI_API_LNGSTRINGW_BUF(IDS_CONFIRM_QUIT, titleStr, ARRAYSIZE(titleStr)), MB_ICONWARNING, 10000))
+			{
+				*((WPARAM*)wParam) = 1;
 			}
 		}
 	}

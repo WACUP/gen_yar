@@ -13,6 +13,8 @@
 #define IDS_COPY_FILE_MENU              8
 #define IDS_UNINSTALL_PROMPT            9
 #define IDS_ABOUT_MESSAGE               9
+#define IDS_CONFIRM_QUIT                10
+#define IDS_CANCEL_AND_QUIT             11
 #define IDR_ACCEL_YAR                   101
 #define IDD_FILEDLG                     102
 #define IDC_PLAYLIST                    1000
