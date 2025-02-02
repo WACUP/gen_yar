@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.2"
+#define APPVER   "2.0.3"
 
 
 int PlayListCount = 0;
@@ -244,8 +244,11 @@ DWORD WINAPI CopyThread(LPVOID lp)
 	if (param) {
 		(void)CreateCOM();
 
+		wchar_t title_str[GETFILEINFO_TITLE_LENGTH] = { 0 },
+				*files = (param->queue ? param->queue->data() : NULL), *file = files;
 		INT_PTR db_error = FALSE;
-		SHFILEOPSTRUCT fileOp = { plugin.hwndParent, FO_COPY, NULL, NULL, FOF_MULTIDESTFILES | FOF_NOCONFIRMMKDIR, FALSE, NULL, NULL };
+		SHFILEOPSTRUCT fileOp = { plugin.hwndParent, FO_COPY, NULL, NULL, FOF_MULTIDESTFILES |
+													  FOF_NOCONFIRMMKDIR, FALSE, NULL, NULL };
 		std::vector<wchar_t> From, To;
 		wchar_t numberFormatString[8] = { 0 }; // "%03d_"
 		HANDLE hPlsFile = INVALID_HANDLE_VALUE;
@@ -289,8 +292,6 @@ DWORD WINAPI CopyThread(LPVOID lp)
 			StringCchPrintf(numberFormatString, ARRAYSIZE(numberFormatString), L"%%0%dd_", numberLength);
 		}
 
-		wchar_t title_str[GETFILEINFO_TITLE_LENGTH] = { 0 };
-		wchar_t *files = (param->queue ? param->queue->data() : NULL), *file = files;
 		for (int x = 0; x < PlayListCount; x++) {
 			wchar_t destFilename[MAX_PATH] = { 0 };
 			BOOL valid_entry = FALSE;
