@@ -21,10 +21,11 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.3"
+#define APPVER   "2.0.4"
 
 
-int PlayListCount = 0;
+int PlayListCount = 0,
+	config_open = 0;
 HANDLE g_hCopyThread = NULL;
 UINT my_menu = (UINT)-1;
 BOOL g_bSavePlaylist = FALSE,
@@ -45,9 +46,9 @@ SETUP_API_LNG_VARS;
 		ARRAYSIZE(tempt), WASABI_API_LNGSTRINGW(IDS_PLUGIN_NAME), TEXT(APPVER));\
 		unicode_title = plugin.memmgr->sysDupStr(tempt); }}
 
-void config();
-void quit();
-int init();
+void config(void);
+void quit(void);
+int init(void);
 
 void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const
 						 WPARAM wParam, const LPARAM lParam);
@@ -58,8 +59,7 @@ winampGeneralPurposePlugin plugin =
 	init, config, quit, GEN_INIT_WACUP_HAS_MESSAGES
 };
 
-int config_open = 0;
-void config(){
+void config(void){
 	if(!config_open){
 	wchar_t message[512] = { 0 };
 		config_open = 1;
@@ -629,55 +629,57 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 				*((WPARAM*)wParam) = 1;
 			}
 		}
+		else if (lParam == IPC_WACUP_HAS_LOADED)
+		{
+			ACCEL accel[] = {{FVIRTKEY|FALT,'C',},
+								// this is an alternative for mainly Bento/SUI skins
+								// where Alt+C is already being used for Skin Settings
+								// changed with 1.13 from Alt+R to Alt+U as that isn't
+								// going to conflict with WACUP & it's Waveform Seeker
+								// which is using Alt+R out of a limited set of chars.
+								{FVIRTKEY|FALT,'U',}};
+			MENUITEMINFO mii = { 0 };
+			my_menu = RegisterCommandID(0);
+			accel[0].cmd = (WORD)my_menu;
+			accel[1].cmd = (WORD)my_menu;
+
+			// we associate the accelerators to the playlist editor as
+			// otherwise the adding will fail due to a quirk in the api
+			HACCEL hAccel = CreateAcceleratorTable(accel, 2);
+			if (hAccel) plugin.app->app_addAccelerators(GetPlaylistWnd(), &hAccel, 2, TRANSLATE_MODE_GLOBAL);
+
+			#define ID_HELP_HELPTOPICS 40347
+			// get a handle of the playlist editor right-click menu
+			const HMENU menu = GetSubMenu(GetNativeMenu((WPARAM)-1), 0);
+			const int count = GetMenuItemCount(menu) - 3,
+					  position = count + (GetMenuItemID(menu, count) != ID_HELP_HELPTOPICS);
+			mii.cbSize = sizeof(MENUITEMINFOW);
+			mii.fMask = MIIM_ID | MIIM_TYPE | MIIM_DATA;
+			mii.fType = MFT_SEPARATOR;
+			InsertMenuItem(menu, position, 1, &mii);
+
+			mii.wID = my_menu;
+			mii.fType = MFT_STRING;
+			mii.dwTypeData = WASABI_API_LNGSTRINGW(IDS_COPY_FILE_MENU);
+			InsertMenuItem(menu, position, 1, &mii);
+		}
 	}
 }
 
-int init(){
-ACCEL accel[] = {{FVIRTKEY|FALT,'C',},
-					// this is an alternative for mainly Bento/SUI skins
-					// where Alt+C is already being used for Skin Settings
-					// changed with 1.13 from Alt+R to Alt+U as that isn't
-					// going to conflict with WACUP & it's Waveform Seeker
-					// which is using Alt+R out of a limited set of chars.
-					{FVIRTKEY|FALT,'U',}};
-MENUITEMINFO mii = { 0 };
-
+int init(void){
 	WASABI_API_START_LANG_DESC(plugin.language, plugin.hDllInstance,
 								GenYarLangGUID, IDS_PLUGIN_NAME,
 								TEXT(APPVER), &plugin.description);
-
-	my_menu = RegisterCommandID(0);
-	accel[0].cmd = (WORD)my_menu;
-	accel[1].cmd = (WORD)my_menu;
-
-	// we associate the accelerators to the playlist editor as
-	// otherwise the adding will fail due to a quirk in the api
-	HACCEL hAccel = CreateAcceleratorTable(accel, 2);
-	if (hAccel) plugin.app->app_addAccelerators(GetPlaylistWnd(), &hAccel, 2, TRANSLATE_MODE_GLOBAL);
-
-	#define ID_HELP_HELPTOPICS 40347
-	// get a handle of the playlist editor right-click menu
-	const HMENU menu = GetSubMenu(GetNativeMenu((WPARAM)-1), 0);
-	int adjuster = 3 + (GetMenuItemID(menu,GetMenuItemCount(menu)-3) != ID_HELP_HELPTOPICS);
-	mii.cbSize = sizeof(MENUITEMINFOW);
-	mii.fMask = MIIM_ID|MIIM_TYPE|MIIM_DATA;
-	mii.fType = MFT_SEPARATOR;
-	InsertMenuItem(menu,GetMenuItemCount(menu)-adjuster,1,&mii);
-
-	mii.wID = my_menu;
-	mii.fType = MFT_STRING;
-	mii.dwTypeData = WASABI_API_LNGSTRINGW(IDS_COPY_FILE_MENU);
-	InsertMenuItem(menu,GetMenuItemCount(menu)-adjuster-1,1,&mii);
 	return GEN_INIT_SUCCESS;
 }
 
-void quit(){
-	if(g_hCopyThread != NULL){
+void quit(void){
+	if(CheckThreadHandleIsValid(&g_hCopyThread)){
 		WaitForSingleObject(g_hCopyThread,INFINITE);
 		if (g_hCopyThread != NULL) {
 			CloseHandle(g_hCopyThread);
+			g_hCopyThread = NULL;
 		}
-		g_hCopyThread = NULL;
 	}
 }
 
