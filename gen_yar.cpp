@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.4"
+#define APPVER   "2.0.5"
 
 
 int PlayListCount = 0,
@@ -181,11 +181,11 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 	{
 		case WM_INITDIALOG:
 			FileHookInitDialog(hdlg, ((OPENFILENAME*)lParam)->lCustData);
-		return FALSE;
+		break;
 
 		case WM_DESTROY:
 			FileHookDestroy(hdlg);
-		return FALSE;
+		break;
 
 		case WM_NOTIFY:
 			if( ((LPOFNOTIFY)lParam)->hdr.code == CDN_INITDONE) {
@@ -212,8 +212,9 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 		case MYUPDATER:
 		{
 			wchar_t buf[128] = { 0 }, temp[128] = { 0 };
-			StringCchPrintf(buf, ARRAYSIZE(buf), L"%s%s", (lParam ? L"+" : L""),
-							WASABI_API_LNG->FormattedSizeString(temp, ARRAYSIZE(temp), wParam * 1024));
+			StringCchPrintf(buf, ARRAYSIZE(buf), L"%s%s", (lParam ? L"+" :
+							L""), WASABI_API_LNG->FormattedSizeString(temp,
+							ARRAYSIZE(temp), (__int64)(wParam * 1024)));
 			SetDlgItemText(hdlg, IDC_FILESIZE, buf);
 		}
 		return TRUE;
@@ -255,8 +256,8 @@ DWORD WINAPI CopyThread(LPVOID lp)
 
 		// give things a hint for the worst case so
 		// we're less likely to require any resizes
-		From.reserve(PlayListCount * MAX_PATH);
-		To.reserve(PlayListCount * MAX_PATH);
+		From.reserve((size_t)(PlayListCount * MAX_PATH));
+		To.reserve((size_t)(PlayListCount * MAX_PATH));
 
 		if (g_bSavePlaylist) {
 			wchar_t playlistFilename[MAX_PATH] = { 0 };
@@ -385,7 +386,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					if (files) {
 						bool reentrant = false;
 						wchar_t length_str[16] = { 0 };
-						GetFileMetaData(destFilename, L"length", length_str, ARRAYSIZE(length_str), NULL, &reentrant, NULL);
+						GetFileMetaData(destFilename, L"length", length_str, ARRAYSIZE(length_str), NULL, &reentrant, NULL, NULL);
 						if (length_str[0]) {
 							length = (WStr2I(length_str) / 1000);
 						}
