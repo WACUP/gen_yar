@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.5"
+#define APPVER   "2.0.6"
 
 
 int PlayListCount = 0,
@@ -42,9 +42,9 @@ wchar_t *unicode_title = NULL;
 SETUP_API_LNG_VARS;
 
 #define GET_UNICODE_TITLE()\
-		{if(!unicode_title){wchar_t tempt[256] = { 0 };StringCchPrintf(tempt,\
-		ARRAYSIZE(tempt), WASABI_API_LNGSTRINGW(IDS_PLUGIN_NAME), TEXT(APPVER));\
-		unicode_title = plugin.memmgr->sysDupStr(tempt); }}
+		{if(!unicode_title){wchar_t tempt[256] = { 0 }; PrintfCch(tempt,\
+		ARRAYSIZE(tempt), LangString(IDS_PLUGIN_NAME), TEXT(APPVER));\
+		unicode_title = SafeWideDup(tempt); }}
 
 void config(void);
 void quit(void);
@@ -64,8 +64,8 @@ void config(void){
 	wchar_t message[512] = { 0 };
 		config_open = 1;
 		GET_UNICODE_TITLE();
-		StringCchPrintf(message, ARRAYSIZE(message), WASABI_API_LNGSTRINGW(IDS_ABOUT_MESSAGE),
-						unicode_title, WACUP_Author(), WACUP_Copyright(), TEXT(__DATE__));
+		PrintfCch(message, ARRAYSIZE(message), LangString(IDS_ABOUT_MESSAGE),
+				  unicode_title, WACUP_Author(), WACUP_Copyright(), TEXT(__DATE__));
 		MessageBox(0, message, unicode_title, MB_SYSTEMMODAL | MB_ICONINFORMATION);
 		config_open = 0;
 	}
@@ -119,7 +119,7 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 		if (IsWindow(param->hdlg)) {
 			wchar_t temp[64] = { 0 };
 			if (PlayListCount > 1000) {
-				StringCchPrintf(temp, ARRAYSIZE(temp), L"%d,%03d", PlayListCount / 1000, PlayListCount % 1000);
+				PrintfCch(temp, ARRAYSIZE(temp), L"%d,%03d", PlayListCount / 1000, PlayListCount % 1000);
 			}
 			else {
 				I2WStr(PlayListCount, temp, ARRAYSIZE(temp));
@@ -128,14 +128,14 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 			SetDlgItemText(param->hdlg, IDC_FILES, temp);
 			PostMessage(param->hdlg, MYUPDATER, fsize, FALSE);
 		}
-		plugin.memmgr->sysFree(lpParameter);
+		SafeFree(lpParameter);
 	}
 	return 0;
 }
 
 void FileHookInitDialog(HWND hdlg, LPARAM lParam){
 
-	FileCountParam* param = (FileCountParam*)plugin.memmgr->sysMalloc(sizeof(FileCountParam));
+	FileCountParam* param = (FileCountParam*)SafeMalloc(sizeof(FileCountParam));
 	if (param)
 	{
 		param->hdlg = hdlg;
@@ -212,9 +212,9 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 		case MYUPDATER:
 		{
 			wchar_t buf[128] = { 0 }, temp[128] = { 0 };
-			StringCchPrintf(buf, ARRAYSIZE(buf), L"%s%s", (lParam ? L"+" :
-							L""), WASABI_API_LNG->FormattedSizeString(temp,
-							ARRAYSIZE(temp), (__int64)(wParam * 1024)));
+			PrintfCch(buf, ARRAYSIZE(buf), L"%s%s", (lParam ? L"+" : L""),
+					  FormattedSizeStringEx(temp, ARRAYSIZE(temp),
+					  (__int64)(wParam * 1024), NULL));
 			SetDlgItemText(hdlg, IDC_FILESIZE, buf);
 		}
 		return TRUE;
@@ -228,7 +228,7 @@ void WriteLine(HANDLE hFile, const wchar_t* text) {
 
 		// encode as ANSI when saving to a m3u playlist
 		// encode as UTF8 when saving to a m3u8 playlist
-		AutoChar textA8(text, (!g_bSavem3u8 ? CP_ACP : CP_UTF8));
+		const AutoChar textA8(text, (!g_bSavem3u8 ? CP_ACP : CP_UTF8));
 		(void)WriteFile(hFile, textA8, (DWORD)strlen(textA8), &byteswritten, NULL);
 	}
 }
@@ -267,7 +267,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 
 			if (hPlsFile == INVALID_HANDLE_VALUE) {
 				GET_UNICODE_TITLE();
-				MessageBox(plugin.hwndParent, WASABI_API_LNGSTRINGW(IDS_ERROR_CREATING_PL), unicode_title, MB_OK);
+				MessageBox(plugin.hwndParent, LangString(IDS_ERROR_CREATING_PL), unicode_title, MB_OK);
 				goto skip_copy;
 			}
 
@@ -290,7 +290,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				PlayListCount < 1000000 ? 6 :
 				PlayListCount < 10000000 ? 7 :
 				PlayListCount < 100000000 ? 8 : 9);
-			StringCchPrintf(numberFormatString, ARRAYSIZE(numberFormatString), L"%%0%dd_", numberLength);
+			PrintfCch(numberFormatString, ARRAYSIZE(numberFormatString), L"%%0%dd_", numberLength);
 		}
 
 		for (int x = 0; x < PlayListCount; x++) {
@@ -300,12 +300,12 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				GetPlaylistFile(x, destFilename, ARRAYSIZE(destFilename), &valid_entry, NULL);
 			}
 			else {
-				StringCchCopy(destFilename, ARRAYSIZE(destFilename), file);
+				CopyCchStr(destFilename, ARRAYSIZE(destFilename), file);
 				valid_entry = (file && *file);
 				file += (wcslen(file) + 1);
 			}
 
-			const BOOL is_an_url = IsAnUrl(destFilename);
+			const BOOL is_an_url = IsPathURL(destFilename);
 			size_t size = (valid_entry && !is_an_url ? GetFileSizeByPath(destFilename) : INVALID_FILE_SIZE);
 			if (size && (size != INVALID_FILE_SIZE)) { // skip missing / bad files
 				const wchar_t *sourcePath = destFilename,
@@ -331,7 +331,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				// add number
 				if (g_bNumberFiles) {
 					wchar_t number[16] = { 0 };
-					StringCchPrintf(number, ARRAYSIZE(number), numberFormatString, x + 1);
+					PrintfCch(number, ARRAYSIZE(number), numberFormatString, x + 1);
 					to_str = number;
 					To.insert(To.end(), to_str.begin(), to_str.end());
 				}
@@ -368,10 +368,10 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				// is being used as unlike older builds we do not strip
 				// the extension away when using the existing filename.
 				if (g_bUsePlaylistTitle) {
-					wchar_t ext[128] = { 0 };
-					ExtractExtension(sourceFilename, ext, ARRAYSIZE(ext));
+					wchar_t ext[128] = { L"." };
+					ExtractExtension(sourceFilename, (ext + 1), (ARRAYSIZE(ext) - 1));
 					to_str = ext;
-					To.push_back(L'.');	// this isn't provided to us
+					//To.push_back(L'.');	// this isn't provided to us
 					To.insert(To.end(), to_str.begin(), to_str.end());
 				}
 
@@ -380,7 +380,6 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				// -- add playlist entry
 				if (g_bSavePlaylist) {
 					char temp[32] = { 0 };
-					size_t remaining = ARRAYSIZE(temp);
 					DWORD byteswritten = 0;
 					int length = -1;
 					if (files) {
@@ -392,9 +391,9 @@ DWORD WINAPI CopyThread(LPVOID lp)
 						}
 					}
 
-					StringCchPrintfExA(temp, ARRAYSIZE(temp), NULL, &remaining, NULL,
-									   "#EXTINF:%d,", (!files ? GetSongLength(x) : length));
-					WriteFile(hPlsFile, temp, (DWORD)(ARRAYSIZE(temp) - remaining), &byteswritten, NULL);
+					const size_t temp_len = PrintfCchA(temp, ARRAYSIZE(temp), "#EXTINF:%d,",
+													  (!files ? GetSongLength(x) : length));
+					WriteFile(hPlsFile, temp, (DWORD)temp_len, &byteswritten, NULL);
 
 					if (!files) {
 						WriteLine(hPlsFile, GetPlaylistItemTitle(x));
@@ -417,7 +416,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 			// bad/missing file
 			else if (!is_an_url) {
 				wchar_t temp[MAX_PATH + 20] = { 0 };
-				StringCchPrintf(temp, ARRAYSIZE(temp), WASABI_API_LNGSTRINGW(IDS_ERROR_COPYING), destFilename);
+				PrintfCch(temp, ARRAYSIZE(temp), LangString(IDS_ERROR_COPYING), destFilename);
 				GET_UNICODE_TITLE();
 				MessageBox(plugin.hwndParent, temp, unicode_title, MB_OK);
 			}
@@ -439,7 +438,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 skip_copy:
 		CloseCOM();
 
-		plugin.memmgr->sysFree(param);
+		SafeFree(param);
 	}
 
 	if (g_hCopyThread != NULL) {
@@ -450,7 +449,7 @@ skip_copy:
 }
 
 void SaveThemFiles(std::vector<wchar_t>* queue){
-	CopyThreadParam* param = (CopyThreadParam*)plugin.memmgr->sysMalloc(sizeof(CopyThreadParam));
+	CopyThreadParam* param = (CopyThreadParam*)SafeMalloc(sizeof(CopyThreadParam));
 	if (param){
 		OPENFILENAME ofn = { 0 };
 		wchar_t allFiles[32] = { 0 };
@@ -462,11 +461,11 @@ void SaveThemFiles(std::vector<wchar_t>* queue){
 		ofn.lStructSize = sizeof(OPENFILENAME);
 		ofn.lpstrFile = param->destination;
 		ofn.nMaxFile = ARRAYSIZE(param->destination);
-		ofn.lpstrTitle = WASABI_API_LNGSTRINGW(IDS_SELECT_LOCATION);
+		ofn.lpstrTitle = LangString(IDS_SELECT_LOCATION);
 		ofn.hwndOwner = GetDialogBoxParent();
-		ofn.lpstrFilter = FixFilterString(WASABI_API_LNGSTRINGW_BUF(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
+		ofn.lpstrFilter = FixFilterString(LngStringCopy(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
 		ofn.lpstrInitialDir = ofn.lpstrDefExt = ofn.lpstrCustomFilter = ofn.lpstrFileTitle = NULL;
-		WASABI_API_LNGSTRINGW_BUF(IDS_FILENAME_IGNORED,param->destination,ARRAYSIZE(param->destination));
+		LngStringCopy(IDS_FILENAME_IGNORED,param->destination,ARRAYSIZE(param->destination));
 
 		if(SaveFileName(&ofn)){
 			param->destination[ofn.nFileOffset] = 0;
@@ -474,14 +473,14 @@ void SaveThemFiles(std::vector<wchar_t>* queue){
 			g_hCopyThread=StartThread(CopyThread,param,THREAD_PRIORITY_NORMAL,1,NULL);
 		}
 		else{
-			plugin.memmgr->sysFree(param);
+			SafeFree(param);
 		}
 	}
 }
 
 void insert_playlist_item(std::vector<wchar_t>* queue, LPCWSTR filename)
 {
-	if (!IsAnUrl(filename))
+	if (!IsPathURL(filename))
 	{
 		std::wstring_view str(filename);
 		queue->insert(queue->end(), str.begin(), str.end());
@@ -528,7 +527,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 			const onSendToMenuStuff* stuff = (onSendToMenuStuff*)wParam;
 			if (wParam && ML_TYPE_HANDLE_FILE_TYPES(stuff->param1))
 			{
-				static LPCWSTR copy_files_str = WASABI_API_LNGSTRINGW_DUP(IDS_COPY_FILES_FROM_SENDTO);
+				static LPCWSTR copy_files_str = LngStringDup(IDS_COPY_FILES_FROM_SENDTO);
 				MLAddToSendTo(copy_files_str, stuff->param2, (INT_PTR)MessageProc);
 			}
 		}
@@ -624,8 +623,9 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 			// have to get the user to cancel the action.
 			// due to that we're going to block the close
 			wchar_t titleStr[96] = { 0 };
-			if (!!g_hCopyThread && TimedMessageBox(plugin.hwndParent, WASABI_API_LNGSTRINGW(IDS_CANCEL_AND_QUIT),
-				WASABI_API_LNGSTRINGW_BUF(IDS_CONFIRM_QUIT, titleStr, ARRAYSIZE(titleStr)), MB_ICONWARNING, 10000))
+			if (!!g_hCopyThread && TimedMessageBox(plugin.hwndParent, LangString(IDS_CANCEL_AND_QUIT),
+												   LngStringCopy(IDS_CONFIRM_QUIT, titleStr,
+												   ARRAYSIZE(titleStr)), MB_ICONWARNING, 10000))
 			{
 				*((WPARAM*)wParam) = 1;
 			}
@@ -661,16 +661,15 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 
 			mii.wID = my_menu;
 			mii.fType = MFT_STRING;
-			mii.dwTypeData = WASABI_API_LNGSTRINGW(IDS_COPY_FILE_MENU);
+			mii.dwTypeData = LangString(IDS_COPY_FILE_MENU);
 			InsertMenuItem(menu, position, 1, &mii);
 		}
 	}
 }
 
 int init(void){
-	WASABI_API_START_LANG_DESC(plugin.language, plugin.hDllInstance,
-								GenYarLangGUID, IDS_PLUGIN_NAME,
-								TEXT(APPVER), &plugin.description);
+	StartPluginLangWithDesc(plugin.hDllInstance, GenYarLangGUID, IDS_PLUGIN_NAME,
+											  TEXT(APPVER), &plugin.description);
 	return GEN_INIT_SUCCESS;
 }
 
@@ -690,9 +689,7 @@ extern "C" __declspec( dllexport ) winampGeneralPurposePlugin * winampGetGeneral
 
 extern "C" __declspec( dllexport ) int winampUninstallPlugin(HINSTANCE hDllInst, HWND hwndDlg, int param){
 	GET_UNICODE_TITLE();
-	if (plugin.language->UninstallSettingsPrompt(reinterpret_cast<const wchar_t*>(unicode_title))) {
-		WritePrivateProfileString(APPNAMEW,0,0,GetPaths()->plugin_ini_file);
-	}
+	UninstallSettingsPrompt(reinterpret_cast<const wchar_t*>(unicode_title), PLUGIN_INI, APPNAMEW);
 	return GEN_PLUGIN_UNINSTALL_REBOOT;
 }
 
