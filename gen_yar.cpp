@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.6"
+#define APPVER   "2.0.7"
 
 
 int PlayListCount = 0,
@@ -61,7 +61,7 @@ winampGeneralPurposePlugin plugin =
 
 void config(void){
 	if(!config_open){
-	wchar_t message[512] = { 0 };
+	wchar_t message[512]/* = { 0 }*/;
 		config_open = 1;
 		GET_UNICODE_TITLE();
 		PrintfCch(message, ARRAYSIZE(message), LangString(IDS_ABOUT_MESSAGE),
@@ -88,8 +88,10 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 		if (!param->queue) {
 			PlayListCount = GetPlaylistLength();
 
+			wchar_t buffer[FILENAME_SIZE]/* = { 0 }*/;
 			for (int x = 0; x < PlayListCount; x++) {
-				const size_t size = GetFileSizeByPath(GetPlaylistItemFile(x, NULL));
+				const size_t size = GetFileSizeByPath(GetPlaylistItemFile(x, NULL,
+												buffer, ARRAYSIZE(buffer), NULL));
 				if (size && (size != INVALID_FILE_SIZE))
 				{
 					fsize += (size / 1024);
@@ -117,7 +119,7 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 		}
 
 		if (IsWindow(param->hdlg)) {
-			wchar_t temp[64] = { 0 };
+			wchar_t temp[64]/* = { 0 }*/;
 			if (PlayListCount > 1000) {
 				PrintfCch(temp, ARRAYSIZE(temp), L"%d,%03d", PlayListCount / 1000, PlayListCount % 1000);
 			}
@@ -211,7 +213,7 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 
 		case MYUPDATER:
 		{
-			wchar_t buf[128] = { 0 }, temp[128] = { 0 };
+			wchar_t buf[128]/* = { 0 }*/, temp[128]/* = { 0 }*/;
 			PrintfCch(buf, ARRAYSIZE(buf), L"%s%s", (lParam ? L"+" : L""),
 					  FormattedSizeStringEx(temp, ARRAYSIZE(temp),
 					  (__int64)(wParam * 1024), NULL));
@@ -260,7 +262,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 		To.reserve((size_t)(PlayListCount * MAX_PATH));
 
 		if (g_bSavePlaylist) {
-			wchar_t playlistFilename[MAX_PATH] = { 0 };
+			wchar_t playlistFilename[MAX_PATH]/* = { 0 }*/;
 			hPlsFile = CreateFile(CombinePath(playlistFilename, param->destination, (!g_bSavem3u8 ?
 								  L"playlist.m3u" : L"playlist.m3u8")), GENERIC_WRITE,
 								  FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, 0, NULL);
@@ -293,8 +295,8 @@ DWORD WINAPI CopyThread(LPVOID lp)
 			PrintfCch(numberFormatString, ARRAYSIZE(numberFormatString), L"%%0%dd_", numberLength);
 		}
 
+		wchar_t destFilename[MAX_PATH]/* = { 0 }*/;
 		for (int x = 0; x < PlayListCount; x++) {
-			wchar_t destFilename[MAX_PATH] = { 0 };
 			BOOL valid_entry = FALSE;
 			if (!files)	{
 				GetPlaylistFile(x, destFilename, ARRAYSIZE(destFilename), &valid_entry, NULL);
@@ -330,7 +332,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 
 				// add number
 				if (g_bNumberFiles) {
-					wchar_t number[16] = { 0 };
+					wchar_t number[16]/* = { 0 }*/;
 					PrintfCch(number, ARRAYSIZE(number), numberFormatString, x + 1);
 					to_str = number;
 					To.insert(To.end(), to_str.begin(), to_str.end());
@@ -339,10 +341,9 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				// get dest title (either playlist title or filename without path and extension)
 				if (g_bUsePlaylistTitle) {
 					if (!files) {
-						to_str = (wchar_t*)GetPlaylistItemTitle(x);
+						to_str = (wchar_t*)GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str));
 					}
 					else {
-						title_str[0] = 0;
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, 1, NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str), 0, 0 };
 						Handle_IPC_FORMAT_TITLE_EXTENDED(&fmt_title, FALSE, &db_error);
@@ -379,14 +380,15 @@ DWORD WINAPI CopyThread(LPVOID lp)
 
 				// -- add playlist entry
 				if (g_bSavePlaylist) {
-					char temp[32] = { 0 };
+					char temp[32]/* = { 0 }*/;
 					DWORD byteswritten = 0;
 					int length = -1;
 					if (files) {
 						bool reentrant = false;
-						wchar_t length_str[16] = { 0 };
-						GetFileMetaData(destFilename, L"length", length_str, ARRAYSIZE(length_str), NULL, &reentrant, NULL, NULL);
-						if (length_str[0]) {
+						wchar_t length_str[16]/* = { 0 }*/;
+						if (*GetFileMetaData(destFilename, L"length", length_str,
+											 ARRAYSIZE(length_str), NULL,
+											 &reentrant, NULL, NULL)) {
 							length = (WStr2I(length_str) / 1000);
 						}
 					}
@@ -396,10 +398,9 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					WriteFile(hPlsFile, temp, (DWORD)temp_len, &byteswritten, NULL);
 
 					if (!files) {
-						WriteLine(hPlsFile, GetPlaylistItemTitle(x));
+						WriteLine(hPlsFile, GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str)));
 					}
 					else {
-						title_str[0] = 0;
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, 1, NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str), 0, 0 };
 						Handle_IPC_FORMAT_TITLE_EXTENDED(&fmt_title, FALSE, &db_error);
@@ -415,7 +416,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 			}
 			// bad/missing file
 			else if (!is_an_url) {
-				wchar_t temp[MAX_PATH + 20] = { 0 };
+				wchar_t temp[MAX_PATH + 20]/* = { 0 }*/;
 				PrintfCch(temp, ARRAYSIZE(temp), LangString(IDS_ERROR_COPYING), destFilename);
 				GET_UNICODE_TITLE();
 				MessageBox(plugin.hwndParent, temp, unicode_title, MB_OK);
@@ -452,7 +453,7 @@ void SaveThemFiles(std::vector<wchar_t>* queue){
 	CopyThreadParam* param = (CopyThreadParam*)SafeMalloc(sizeof(CopyThreadParam));
 	if (param){
 		OPENFILENAME ofn = { 0 };
-		wchar_t allFiles[32] = { 0 };
+		wchar_t allFiles[32]/* = { 0 }*/;
 		ofn.Flags = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_EXPLORER | OFN_ENABLETEMPLATE | OFN_ENABLEHOOK | OFN_ENABLESIZING;
 		ofn.hInstance = WASABI_API_LNG_HINST;
 		ofn.lpTemplateName = MAKEINTRESOURCE(IDD_FILEDLG);
@@ -622,7 +623,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 			// if we're in the process of copying then we
 			// have to get the user to cancel the action.
 			// due to that we're going to block the close
-			wchar_t titleStr[96] = { 0 };
+			wchar_t titleStr[96]/* = { 0 }*/;
 			if (!!g_hCopyThread && TimedMessageBox(plugin.hwndParent, LangString(IDS_CANCEL_AND_QUIT),
 												   LngStringCopy(IDS_CONFIRM_QUIT, titleStr,
 												   ARRAYSIZE(titleStr)), MB_ICONWARNING, 10000))
@@ -647,7 +648,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 			// we associate the accelerators to the playlist editor as
 			// otherwise the adding will fail due to a quirk in the api
 			HACCEL hAccel = CreateAcceleratorTable(accel, 2);
-			if (hAccel) plugin.app->app_addAccelerators(GetPlaylistWnd(), &hAccel, 2, TRANSLATE_MODE_GLOBAL);
+			if (hAccel) AddAccelerators(GetPlaylistWnd(), &hAccel, 2, TRANSLATE_MODE_GLOBAL);
 
 			#define ID_HELP_HELPTOPICS 40347
 			// get a handle of the playlist editor right-click menu
