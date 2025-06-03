@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.7"
+#define APPVER   "2.0.8"
 
 
 int PlayListCount = 0,
@@ -675,13 +675,7 @@ int init(void){
 }
 
 void quit(void){
-	if(CheckThreadHandleIsValid(&g_hCopyThread)){
-		WaitForSingleObject(g_hCopyThread,INFINITE);
-		if (g_hCopyThread != NULL) {
-			CloseHandle(g_hCopyThread);
-			g_hCopyThread = NULL;
-		}
-	}
+	WaitForThreadToClose(&g_hCopyThread,INFINITE);
 }
 
 extern "C" __declspec( dllexport ) winampGeneralPurposePlugin * winampGetGeneralPurposePlugin(){
