@@ -21,7 +21,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.8"
+#define APPVER   "2.0.9"
 
 
 int PlayListCount = 0,
@@ -346,7 +346,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, 1, NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str), 0, 0 };
-						Handle_IPC_FORMAT_TITLE_EXTENDED(&fmt_title, FALSE, &db_error);
+						GetFormattedTitleEx(&fmt_title, FALSE, &db_error);
 						to_str = title_str;
 					}
 				}
@@ -403,7 +403,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, 1, NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str), 0, 0 };
-						Handle_IPC_FORMAT_TITLE_EXTENDED(&fmt_title, FALSE, &db_error);
+						GetFormattedTitleEx(&fmt_title, FALSE, &db_error);
 						if (title_str[0]) {
 							WriteLine(hPlsFile, title_str);
 						}
