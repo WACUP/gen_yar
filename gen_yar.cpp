@@ -1,13 +1,11 @@
 #include <windows.h>
 #include <commdlg.h>
-#include <strsafe.h>
 
 #include <loader/loader/utils.h>
 #include <loader/loader/ini.h>
 #include <loader/loader/paths.h>
 #include <loader/loader/runtime_helper.h>
 
-#include <nu/autochar.h>
 #include <nu/servicebuilder.h>
 #include <nu/MediaLibraryInterface2.h>
 
@@ -21,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.9"
+#define APPVER   "2.0.10"
 
 
 int PlayListCount = 0,
@@ -227,11 +225,14 @@ UINT_PTR APIENTRY OFNHookProc(HWND hdlg, UINT uiMsg, WPARAM wParam, LPARAM lPara
 void WriteLine(HANDLE hFile, const wchar_t* text) {
 	if (text && *text) {
 	DWORD byteswritten = 0;
+	size_t text_len = 0;
 
 		// encode as ANSI when saving to a m3u playlist
 		// encode as UTF8 when saving to a m3u8 playlist
-		const AutoChar textA8(text, (!g_bSavem3u8 ? CP_ACP : CP_UTF8));
-		(void)WriteFile(hFile, textA8, (DWORD)strlen(textA8), &byteswritten, NULL);
+		LPCSTR textA8 = ConvertUnicode(text, -1, (!g_bSavem3u8 ? CP_ACP :
+										CP_UTF8), 0, NULL, 0, &text_len);
+		(void)WriteFile(hFile, textA8, (DWORD)text_len, &byteswritten, NULL);
+		SafeFree((void*)textA8);
 	}
 }
 
@@ -253,7 +254,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 		SHFILEOPSTRUCT fileOp = { plugin.hwndParent, FO_COPY, NULL, NULL, FOF_MULTIDESTFILES |
 													  FOF_NOCONFIRMMKDIR, FALSE, NULL, NULL };
 		std::vector<wchar_t> From, To;
-		wchar_t numberFormatString[8] = { 0 }; // "%03d_"
+		wchar_t numberFormatString[8]/* = { 0 }*/; // "%03d_"
 		HANDLE hPlsFile = INVALID_HANDLE_VALUE;
 
 		// give things a hint for the worst case so
@@ -293,6 +294,10 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				PlayListCount < 10000000 ? 7 :
 				PlayListCount < 100000000 ? 8 : 9);
 			PrintfCch(numberFormatString, ARRAYSIZE(numberFormatString), L"%%0%dd_", numberLength);
+		}
+		else
+		{
+			numberFormatString[0] = 0;
 		}
 
 		wchar_t destFilename[MAX_PATH]/* = { 0 }*/;
@@ -548,6 +553,17 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 							insert_playlist_item(queue, p->Items[x].filename);
 						}
 					}
+					else if ((stuff->param1 == ML_TYPE_FILENAMESW) ||
+							 (stuff->param1 == ML_TYPE_STREAMNAMESW))
+					{
+						wchar_t* p = (wchar_t*)stuff->param2;
+						while (p && *p)
+						{
+							insert_playlist_item(queue, p);
+							p += (wcslen(p) + 1);
+						}
+					}
+#ifndef _WIN64
 					else if (stuff->param1 == ML_TYPE_ITEMRECORDLIST)
 					{
 						itemRecordList* p = (itemRecordList*)stuff->param2;
@@ -557,7 +573,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 						}
 					}
 					else if ((stuff->param1 == ML_TYPE_FILENAMES) ||
-						(stuff->param1 == ML_TYPE_STREAMNAMES))
+							 (stuff->param1 == ML_TYPE_STREAMNAMES))
 					{
 						char* p = (char*)stuff->param2;
 						while (p && *p)
@@ -566,16 +582,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 							p += (strlen(p) + 1);
 						}
 					}
-					else if ((stuff->param1 == ML_TYPE_FILENAMESW) ||
-						(stuff->param1 == ML_TYPE_STREAMNAMESW))
-					{
-						wchar_t* p = (wchar_t*)stuff->param2;
-						while (p && *p)
-						{
-							insert_playlist_item(queue, p);
-							p += (wcslen(p) + 1);
-						}
-					}
+#endif
 					else if (stuff->param1 == ML_TYPE_PLAYLIST)
 					{
 						mlPlaylist* playlist = (mlPlaylist*)stuff->param2;
