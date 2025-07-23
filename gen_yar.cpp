@@ -231,7 +231,7 @@ void WriteLine(HANDLE hFile, const wchar_t* text) {
 		// encode as UTF8 when saving to a m3u8 playlist
 		LPCSTR textA8 = ConvertUnicode(text, -1, (!g_bSavem3u8 ? CP_ACP :
 										CP_UTF8), 0, NULL, 0, &text_len);
-		(void)WriteFile(hFile, textA8, (DWORD)text_len, &byteswritten, NULL);
+		(void)WriteFile(hFile, textA8, (DWORD)(text_len - 1), &byteswritten, NULL);
 		SafeFree((void*)textA8);
 	}
 }
