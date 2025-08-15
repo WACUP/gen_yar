@@ -19,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.10"
+#define APPVER   "2.0.12"
 
 
 int PlayListCount = 0,
@@ -40,9 +40,9 @@ wchar_t *unicode_title = NULL;
 SETUP_API_LNG_VARS;
 
 #define GET_UNICODE_TITLE()\
-		{if(!unicode_title){wchar_t tempt[256] = { 0 }; PrintfCch(tempt,\
-		ARRAYSIZE(tempt), LangString(IDS_PLUGIN_NAME), TEXT(APPVER));\
-		unicode_title = SafeWideDup(tempt); }}
+		{if(!unicode_title){wchar_t tempt[256]; const size_t tempt_len = \
+		PrintfCch(tempt,ARRAYSIZE(tempt), LangString(IDS_PLUGIN_NAME),\
+		TEXT(APPVER)); unicode_title = SafeWideDupN(tempt, tempt_len); }}
 
 void config(void);
 void quit(void);
@@ -307,9 +307,9 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				GetPlaylistFile(x, destFilename, ARRAYSIZE(destFilename), &valid_entry, NULL);
 			}
 			else {
-				CopyCchStr(destFilename, ARRAYSIZE(destFilename), file);
+				const size_t copied = CopyCchStrEx(destFilename, ARRAYSIZE(destFilename), file);
 				valid_entry = (file && *file);
-				file += (wcslen(file) + 1);
+				file += (copied + 1);
 			}
 
 			const BOOL is_an_url = IsPathURL(destFilename);
@@ -469,7 +469,7 @@ void SaveThemFiles(std::vector<wchar_t>* queue){
 		ofn.nMaxFile = ARRAYSIZE(param->destination);
 		ofn.lpstrTitle = LangString(IDS_SELECT_LOCATION);
 		ofn.hwndOwner = GetDialogBoxParent();
-		ofn.lpstrFilter = FixFilterString(LngStringCopy(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)));
+		ofn.lpstrFilter = FixFilterString(LngStringCopy(IDS_ALL_FILES,allFiles,ARRAYSIZE(allFiles)), NULL);
 		ofn.lpstrInitialDir = ofn.lpstrDefExt = ofn.lpstrCustomFilter = ofn.lpstrFileTitle = NULL;
 		LngStringCopy(IDS_FILENAME_IGNORED,param->destination,ARRAYSIZE(param->destination));
 
