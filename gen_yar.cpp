@@ -19,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.13"
+#define APPVER   "2.0.14"
 
 
 int PlayListCount = 0,
@@ -640,6 +640,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 		}
 		else if (lParam == IPC_WACUP_HAS_LOADED)
 		{
+			wchar_t menu_buf[64];
 			ACCEL accel[] = {{FVIRTKEY|FALT,'C',},
 								// this is an alternative for mainly Bento/SUI skins
 								// where Alt+C is already being used for Skin Settings
@@ -669,7 +670,7 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 
 			mii.wID = my_menu;
 			mii.fType = MFT_STRING;
-			mii.dwTypeData = LangString(IDS_COPY_FILE_MENU);
+			mii.dwTypeData = LngStringCopy(IDS_COPY_FILE_MENU, menu_buf, ARRAYSIZE(menu_buf));
 			InsertMenuItem(menu, position, 1, &mii);
 		}
 	}
