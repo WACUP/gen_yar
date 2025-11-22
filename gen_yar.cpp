@@ -351,7 +351,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str) FormatTitleExtendedEnabledEnd, 0, 0 };
-						GetFormattedTitleEx(&fmt_title, FALSE, &db_error);
+						GetFormattedTitleEx(&fmt_title, 0, &db_error);
 						to_str = title_str;
 					}
 				}
@@ -408,7 +408,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str) FormatTitleExtendedEnabledEnd, 0, 0 };
-						GetFormattedTitleEx(&fmt_title, FALSE, &db_error);
+						GetFormattedTitleEx(&fmt_title, 0, &db_error);
 						if (title_str[0]) {
 							WriteLine(hPlsFile, title_str);
 						}
