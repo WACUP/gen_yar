@@ -19,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.14"
+#define APPVER   "2.0.15"
 
 
 int PlayListCount = 0,
@@ -641,13 +641,13 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 		else if (lParam == IPC_WACUP_HAS_LOADED)
 		{
 			wchar_t menu_buf[64];
-			ACCEL accel[] = {{FVIRTKEY|FALT,'C',},
-								// this is an alternative for mainly Bento/SUI skins
-								// where Alt+C is already being used for Skin Settings
-								// changed with 1.13 from Alt+R to Alt+U as that isn't
-								// going to conflict with WACUP & it's Waveform Seeker
-								// which is using Alt+R out of a limited set of chars.
-								{FVIRTKEY|FALT,'U',}};
+			ACCEL accel[] = { { FVIRTKEY | FALT, 'C', },
+							  // this is an alternative for mainly Bento/SUI skins
+							  // where Alt+C is already being used for Skin Settings
+							  // changed with 1.13 from Alt+R to Alt+U as that isn't
+							  // going to conflict with WACUP & it's Waveform Seeker
+							  // which is using Alt+R out of a limited set of chars.
+							  { FVIRTKEY | FALT, 'U', } };
 			MENUITEMINFO mii = { 0 };
 			my_menu = RegisterCommandID(0);
 			accel[0].cmd = (WORD)my_menu;
@@ -655,8 +655,8 @@ void __cdecl MessageProc(HWND hWnd, const UINT uMsg, const WPARAM wParam, const 
 
 			// we associate the accelerators to the playlist editor as
 			// otherwise the adding will fail due to a quirk in the api
-			HACCEL hAccel = CreateAcceleratorTable(accel, 2);
-			if (hAccel) AddAccelerators(GetPlaylistWnd(), &hAccel, 2, TRANSLATE_MODE_GLOBAL);
+			AddAccelerators(NULL, NULL, 0, GetPlaylistWnd(),
+						    accel, 2, TRANSLATE_MODE_GLOBAL);
 
 			#define ID_HELP_HELPTOPICS 40347
 			// get a handle of the playlist editor right-click menu
