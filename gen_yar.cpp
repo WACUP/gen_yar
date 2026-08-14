@@ -19,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.15"
+#define APPVER   "2.0.16"
 
 
 int PlayListCount = 0,
@@ -316,7 +316,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 			size_t size = (valid_entry && !is_an_url ? GetFileSizeByPath(destFilename) : INVALID_FILE_SIZE);
 			if (size && (size != INVALID_FILE_SIZE)) { // skip missing / bad files
 				const wchar_t *sourcePath = destFilename,
-							  *sourceFilename = FindPathFileName(sourcePath);
+							  *sourceFilename = FindPathFileName(sourcePath, nullptr);
 				size_t destStartOffset = To.size();
 				std::wstring_view from_str(destFilename);
 				From.insert(From.end(), from_str.begin(), from_str.end());
@@ -350,8 +350,8 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					}
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
-																 title_str, ARRAYSIZE(title_str) FormatTitleExtendedEnabledEnd, 0, 0 };
-						GetFormattedTitleEx(&fmt_title, 0, &db_error);
+																title_str, ARRAYSIZE(title_str) FormatTitleExtendedEnabledEnd, 0, 0 };
+						GetFormattedTitleEx(&fmt_title, 0, &db_error, nullptr);
 						to_str = title_str;
 					}
 				}
@@ -408,7 +408,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
 																 title_str, ARRAYSIZE(title_str) FormatTitleExtendedEnabledEnd, 0, 0 };
-						GetFormattedTitleEx(&fmt_title, 0, &db_error);
+						GetFormattedTitleEx(&fmt_title, 0, &db_error, nullptr);
 						if (title_str[0]) {
 							WriteLine(hPlsFile, title_str);
 						}
