@@ -346,7 +346,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 				// get dest title (either playlist title or filename without path and extension)
 				if (g_bUsePlaylistTitle) {
 					if (!files) {
-						to_str = (wchar_t*)GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str));
+						to_str = (wchar_t*)GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str), nullptr);
 					}
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
@@ -403,7 +403,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 					WriteFile(hPlsFile, temp, (DWORD)temp_len, &byteswritten, NULL);
 
 					if (!files) {
-						WriteLine(hPlsFile, GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str)));
+						WriteLine(hPlsFile, GetPlaylistItemTitle(x, title_str, ARRAYSIZE(title_str), nullptr));
 					}
 					else {
 						waFormatTitleExtended fmt_title = { (LPCWSTR)destFilename, FormatTitleExtendedEnabledStart NULL, destFilename,
