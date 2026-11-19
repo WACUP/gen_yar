@@ -19,7 +19,7 @@
 
 #define APPNAME  "Yar-matey! Playlist Copier"
 #define APPNAMEW L"Yar-matey! Playlist Copier"
-#define APPVER   "2.0.17"
+#define APPVER   "2.0.18"
 
 
 int PlayListCount = 0,
@@ -90,7 +90,7 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 			for (int x = 0; x < PlayListCount; x++) {
 				int64_t size = 0;
 				if (GetFileSizeAndTime(GetPlaylistItemFile(x, nullptr, buffer,
-								 ARRAYSIZE(buffer), nullptr), &size, nullptr))
+						  ARRAYSIZE(buffer), nullptr), &size, nullptr, false))
 				{
 					fsize += (size_t)(size / 1024);
 				}
@@ -107,7 +107,7 @@ FileCountParam *param=(FileCountParam*)lpParameter;
 			wchar_t *files = param->queue->data(), *file = files;
 			while (file && *file) {
 				int64_t size = 0;
-				if (GetFileSizeAndTime(file, &size, nullptr))
+				if (GetFileSizeAndTime(file, &size, nullptr, false))
 				{
 					fsize += (size_t)(size / 1024);
 					++PlayListCount;
@@ -314,7 +314,7 @@ DWORD WINAPI CopyThread(LPVOID lp)
 
 			const BOOL is_an_url = IsPathURL(destFilename);
 			int64_t size = 0;
-			if (valid_entry && !is_an_url && GetFileSizeAndTime(destFilename, &size, nullptr)) { // skip missing / bad files
+			if (valid_entry && !is_an_url && GetFileSizeAndTime(destFilename, &size, nullptr, false)) { // skip missing / bad files
 				const wchar_t *sourcePath = destFilename,
 							  *sourceFilename = FindPathFileName(sourcePath, nullptr);
 				size_t destStartOffset = To.size();
